@@ -1,52 +1,41 @@
 mod components;
 
 use yew::prelude::*;
+use material_yew::*;
 use log::info;
 use wasm_bindgen::JsValue;
-use material_yew::*;
 use material_yew::drawer::MatDrawerAppContent;
 use components::block::Block;
 use components::menu::Menu;
+use components::page1::Page1;
 
 
 #[function_component]
 fn App() -> Html {
 
-    let blocks = use_state(|| 10);
+    let page = use_state(|| 1);
 
-    let onclick = {
-        let blocks = blocks.clone();
-        let object = JsValue::from("world");
-        info!("Hello {}", object.as_string().unwrap());
-        move |_| {
-            let value = *blocks + 1;
-            blocks.set(value);
+    let set_page = {
+        let page = page.clone();
+        move |x| {
+            info!("selected index: {:?}", x);
+            page.set(x);
         }
     };
 
-    let mut rows = vec![];
-
-    for _ in 0..*blocks {
-        let mut row = vec![];
-        for _ in 0..*blocks {
-            row.push(html! {
-                <Block />
-            })
-        }
-        rows.push(html! {
-            <div class="row">{row.into_iter().collect::<Html>()}</div>
-        });
-    }
 
     html! {
         <div>
             <MatDrawer>
-                <Menu />
+                <Menu {set_page} />
                 <MatDrawerAppContent>
-                    <MatButton label="Click me!" />
-                    <button {onclick}>{"+1"}</button>
-                    <p>{*blocks}</p>
-                    { rows.into_iter().collect::<Html>()}
+                    {match *page {
+                        0 => html! {<Block />},
+                        1 => html! {<Page1 />},
+                        2 => html! {<Block />},
+                        3 => html! {<Block />},
+                        _ => html! {<Block />},
+                    }}
                 </MatDrawerAppContent>
             </MatDrawer>
         </div>
